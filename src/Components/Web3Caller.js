@@ -46,9 +46,6 @@ const Web3Caller = () => {
     });
     setUsername("");
   };
-  useEffect(()=>{
-
-  },[account,chainId])
   return (
     <div>
       <form className="container" onSubmit={handleSubmit}>
