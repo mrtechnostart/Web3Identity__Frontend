@@ -19,7 +19,11 @@ const FundMe = () => {
   const {runContractFunction:withdrawFund,isLoading:Load,isFetching:Fetch } = useWeb3Contract({
     abi:abiFundMe,
     contractAddress:"0x5646C6e33beEf243d8d60828408d4a3c5A63E6Dd",
-    functionName:"withdrawFund"
+    functionName:"withdrawFund",
+    params:{
+      _owner:currentAccount
+    }
+    
   })
   const {runContractFunction:getmineth} = useWeb3Contract({
     abi:abiFundMe,
@@ -81,7 +85,7 @@ const FundMe = () => {
   return (
     <div>
       {deployer.toLowerCase()===currentAccount.toLowerCase()?<>
-      Hello You are the deployer, Withdraw Your Funds Here: <div className="btn btn-primary" onClick={withdraw} disabled={Load&&Fetch}>Withdraw</div></>:<><form className="container" onSubmit={handleSubmit}>
+      Hello You are the deployer, Withdraw Your Funds Here: <button className="btn btn-primary" onClick={withdraw} disabled={Load || Fetch}>Withdraw</button></>:<><form className="container" onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="exampleInputEmail1" className="form-label">
             How Much You Wanna Donate
