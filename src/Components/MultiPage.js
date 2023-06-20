@@ -16,8 +16,7 @@ const MultiPage = () => {
     })
   return (
     <div>
-      <FundMe/>
-      {contract}
+      <FundMe contractAddress={contract}/>
     </div>
   )
 }

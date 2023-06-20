@@ -3,7 +3,7 @@ import { useMoralis, useWeb3Contract } from 'react-moralis'
 import { abiFundMe } from '../Constants/index'
 import { ethers } from 'ethers'
 import { useNotification } from 'web3uikit'
-const FundMe = () => {
+const FundMe = (props) => {
   const dispatch = useNotification()
   const [ethValue,setEthValue] = useState("0")
   const [deployer,setDeployer] = useState("0x0")
@@ -12,13 +12,13 @@ const FundMe = () => {
   const {isWeb3Enabled,account} = useMoralis()
   const {runContractFunction:fundContract,isLoading,isFetching } = useWeb3Contract({
     abi:abiFundMe,
-    contractAddress:"0x5646C6e33beEf243d8d60828408d4a3c5A63E6Dd",
+    contractAddress:props.contractAddress,
     functionName:"fundContract",
     msgValue:ethValue
   })
   const {runContractFunction:withdrawFund,isLoading:Load,isFetching:Fetch } = useWeb3Contract({
     abi:abiFundMe,
-    contractAddress:"0x5646C6e33beEf243d8d60828408d4a3c5A63E6Dd",
+    contractAddress:props.contractAddress,
     functionName:"withdrawFund",
     params:{
       _owner:currentAccount
@@ -27,12 +27,12 @@ const FundMe = () => {
   })
   const {runContractFunction:getmineth} = useWeb3Contract({
     abi:abiFundMe,
-    contractAddress:"0x5646C6e33beEf243d8d60828408d4a3c5A63E6Dd",
+    contractAddress:props.contractAddress,
     functionName:"getmineth"
   })
   const {runContractFunction:getDeployer} = useWeb3Contract({
     abi:abiFundMe,
-    contractAddress:"0x5646C6e33beEf243d8d60828408d4a3c5A63E6Dd",
+    contractAddress:props.contractAddress,
     functionName:"getDeployer"
   })
   async function getbasicdata(){
@@ -83,27 +83,30 @@ const FundMe = () => {
     getbasicdata()
   },[isWeb3Enabled,account])
   return (
-    <div>
-      {deployer.toLowerCase()===currentAccount.toLowerCase()?<>
-      Hello You are the deployer, Withdraw Your Funds Here: <button className="btn btn-primary" onClick={withdraw} disabled={Load || Fetch}>Withdraw</button></>:<><form className="container" onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="exampleInputEmail1" className="form-label">
-            How Much You Wanna Donate
-          </label>
-          <input
-            type="number"
-            className="form-control"
-            value={amount}
-            onChange={changeHandler}
-            id="exampleInputEmail1"
-            aria-describedby="emailHelp"
-          />
-        </div>
-        <button type="submit" className="btn btn-primary" disabled={isLoading || isFetching || ethValue > ethers.utils.parseEther(amount.toString()===""?"0":amount.toString())}>
-          Donate Now!
-        </button>
-      </form></>}      
-    </div>
+    <>
+    {!isWeb3Enabled?"Loading":<div>
+    {account.toLowerCase()===currentAccount.toLowerCase()?<>
+    Hello You are the deployer, Withdraw Your Funds Here: <button className="btn btn-primary" onClick={withdraw} disabled={Load || Fetch}>Withdraw</button></>:<><form className="container" onSubmit={handleSubmit}>
+      <div className="mb-3">
+        <label htmlFor="exampleInputEmail1" className="form-label">
+          How Much You Wanna Donate
+        </label>
+        <input
+          type="number"
+          className="form-control"
+          value={amount}
+          onChange={changeHandler}
+          id="exampleInputEmail1"
+          aria-describedby="emailHelp"
+        />
+      </div>
+      <button type="submit" className="btn btn-primary" disabled={isLoading || isFetching || ethValue > ethers.utils.parseEther(amount.toString()===""?"0":amount.toString())}>
+        Donate Now!
+      </button>
+    </form></>}
+  </div>}
+          </>
+    
   )
 }
 

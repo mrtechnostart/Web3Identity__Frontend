@@ -2,17 +2,23 @@ import React, { useEffect, useState } from "react";
 import { abi, contractAddress } from "../Constants";
 import { useMoralis, useWeb3Contract } from "react-moralis";
 import { ethers } from "ethers";
-import axios from "axios";
+import Table from "./Table";
+import { useNotification } from "web3uikit";
 const Web3Caller = () => {
-  const [username, setUsername] = useState("Username Here");
-  const [contractAddressed, setContractAddress] = useState("0x0");
+  const defaultAddress = "0x0000000000000000000000000000000000000000";
   const { chainId: chainIdHex, account, isWeb3Enabled } = useMoralis();
+  const mineth = ethers.utils.parseEther("0.001")
+  const [username, setUsername] = useState("");
+  const [contract, setContractAddress] = useState(defaultAddress);
   const chainId = parseInt(chainIdHex);
   const ContractAddress =
     chainId in contractAddress ? contractAddress[chainId][0] : null;
-  const mineth = ethers.utils.parseEther("0.001");
-
-  const { runContractFunction: deployFundMe } = useWeb3Contract({
+  const dispatch = useNotification();
+  const {
+    runContractFunction: deployFundMe,
+    isLoading,
+    isFetching,
+  } = useWeb3Contract({
     abi: abi,
     contractAddress: ContractAddress,
     functionName: "deployFundMe",
@@ -29,43 +35,80 @@ const Web3Caller = () => {
     },
   });
 
-  const changeHandler = (e) => {
-    setUsername(e.target.value);
-  };
+  async function handleSuccess(tx) {
+    await tx.wait(1);
+    handleNotification();
+  }
+  function handleNotification() {
+    dispatch({
+      type: "info",
+      message: "Transaction Completed",
+      title: "Tx Notification",
+      position: "topR",
+    });
+  }
+  async function handleError(error) {
+    dispatch({
+      type: "error",
+      message: error,
+    });
+  }
+  const pushDatabase = async() =>{
+    
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const contractAddress = await getContracts();
-    try {
-      await deployFundMe();
-    } catch (error) {}
-    setContractAddress(contractAddress);
-    await axios.post("http://localhost:4004/postdata", {
-      deployer: account,
-      contract: contractAddressed,
-      name: username,
+    await deployFundMe({
+      onSuccess: handleSuccess,
+      onError: (error) => handleError(error)
     });
-    setUsername("");
+    pushDatabase()
   };
+  const changeHandlerUsername = (e) => {
+    setUsername(e.target.value);
+  };
+  async function handleTask() {
+    let dataContract;
+    try {
+      dataContract = await getContracts();
+    } catch (error) {}
+    setContractAddress(dataContract);
+  }
+  useEffect(() => {
+    handleTask();
+  }, [isWeb3Enabled, account]);
   return (
     <div>
-      <form className="container" onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="exampleInputEmail1" className="form-label">
-            Username
-          </label>
-          <input
-            type="email"
-            className="form-control"
-            value={username}
-            onChange={changeHandler}
-            id="exampleInputEmail1"
-            aria-describedby="emailHelp"
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">
-          Submit
-        </button>
-      </form>
+      {contract === defaultAddress ? (
+        <>
+          <form className="container" onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="exampleInputEmail1" className="form-label">
+                Username
+              </label>
+              <input
+                type="username"
+                value={username}
+                onChange={changeHandlerUsername}
+                className="form-control"
+                id="exampleInputEmail1"
+                aria-describedby="emailHelp"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isLoading || isFetching}
+            >
+              Submit
+            </button>
+          </form>
+          <Table />
+        </>
+      ) : (
+        <>Already Deployed By {account}</>
+      )}
     </div>
   );
 };
