@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 const Table = () => {
   const [data, setData] = useState([]);
   async function getData() {
@@ -31,12 +32,12 @@ const Table = () => {
                   <td>{element["contract"]}</td>
                   <td>{element["name"]}</td>
                   <td>
-                    <a
+                    <Link
                       className="btn btn-primary"
-                      href={"/contracts/" + element["_id"]}
+                      to={"/contracts/" + element["_id"]}
                     >
                       Go Now
-                    </a>
+                    </Link>
                   </td>
                 </tr>
               </>
