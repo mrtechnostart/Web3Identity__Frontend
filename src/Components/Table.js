@@ -14,14 +14,14 @@ const Table = () => {
     getData();
   }, [chainId,account]);
   return (
-    <div>
+    <div className="table-responsive">
       <table class="table container">
         <thead class="thead-dark">
           <tr>
             <th scope="col">#</th>
-            <th scope="col">Deployer Address</th>
             <th scope="col">Name</th>
             <th scope="col">Link</th>
+            <th scope="col">Deployer Address</th>
           </tr>
         </thead>
         <tbody>
@@ -30,16 +30,16 @@ const Table = () => {
               <>
                 <tr>
                   <th scope="row">{index + 1}</th>
-                  <td>{element["deployer"]}</td>
                   <td>{element["name"]}</td>
                   <td>
                     <Link
                       className="btn btn-primary"
                       to={"/contracts/" + element["_id"]}
-                    >
+                      >
                       Go Now
                     </Link>
                   </td>
+                      <td>{element["deployer"]}</td>
                 </tr>
               </>
             );
