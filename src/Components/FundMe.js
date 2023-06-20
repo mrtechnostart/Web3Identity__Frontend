@@ -1,24 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { useMoralis, useWeb3Contract } from 'react-moralis'
-import { abiFundMe } from '../Constants/index'
+import { abiFundMe,abi,contractAddress } from '../Constants/index'
 import { ethers } from 'ethers'
 import { useNotification } from 'web3uikit'
 const FundMe = (props) => {
   const dispatch = useNotification()
+  const {chainId:chainIdHex,isWeb3Enabled,account} = useMoralis()
+  const chainId = parseInt(chainIdHex)
+  const DeployerContractAddress =
+    chainId in contractAddress ? contractAddress[chainId][0] : null
   const [ethValue,setEthValue] = useState("0")
-  const [deployer,setDeployer] = useState("0x0")
+  const [contract,setContract] = useState("0x0")
   const [amount,setAmount] = useState(0)
   const [currentAccount,setCurrentAccount] = useState("0x0")
-  const {isWeb3Enabled,account} = useMoralis()
   const {runContractFunction:fundContract,isLoading,isFetching } = useWeb3Contract({
     abi:abiFundMe,
-    contractAddress:props.contractAddress,
+    contractAddress:contract,
     functionName:"fundContract",
     msgValue:ethValue
   })
   const {runContractFunction:withdrawFund,isLoading:Load,isFetching:Fetch } = useWeb3Contract({
     abi:abiFundMe,
-    contractAddress:props.contractAddress,
+    contractAddress:contract,
     functionName:"withdrawFund",
     params:{
       _owner:currentAccount
@@ -27,20 +30,23 @@ const FundMe = (props) => {
   })
   const {runContractFunction:getmineth} = useWeb3Contract({
     abi:abiFundMe,
-    contractAddress:props.contractAddress,
+    contractAddress:contract,
     functionName:"getmineth"
   })
-  const {runContractFunction:getDeployer} = useWeb3Contract({
-    abi:abiFundMe,
-    contractAddress:props.contractAddress,
-    functionName:"getDeployer"
+  const {runContractFunction:getContracts} = useWeb3Contract({
+    abi:abi,
+    contractAddress:DeployerContractAddress,
+    functionName:"getContracts",
+    params:{
+      _addr:props.deployerAddress
+    }
   })
   async function getbasicdata(){
     if (isWeb3Enabled){
       const mineth = await getmineth()
       setEthValue(mineth)
-      const deployer = await getDeployer()
-      setDeployer(deployer)
+      const contractAddr = await getContracts()
+      setContract(contractAddr)
       setCurrentAccount(account)
     }
   }
@@ -85,7 +91,8 @@ const FundMe = (props) => {
   return (
     <>
     {!isWeb3Enabled?"Loading":<div>
-    {account.toLowerCase()===currentAccount.toLowerCase()?<>
+    {props.deployerAddress.toLowerCase()===currentAccount.toLowerCase()?<>
+    {contract.toString()}<br/>
     Hello You are the deployer, Withdraw Your Funds Here: <button className="btn btn-primary" onClick={withdraw} disabled={Load || Fetch}>Withdraw</button></>:<><form className="container" onSubmit={handleSubmit}>
       <div className="mb-3">
         <label htmlFor="exampleInputEmail1" className="form-label">

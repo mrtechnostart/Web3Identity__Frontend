@@ -4,6 +4,7 @@ import { useMoralis, useWeb3Contract } from "react-moralis";
 import { ethers } from "ethers";
 import Table from "./Table";
 import { useNotification } from "web3uikit";
+import axios from "axios";
 const Web3Caller = () => {
   const defaultAddress = "0x0000000000000000000000000000000000000000";
   const { chainId: chainIdHex, account, isWeb3Enabled } = useMoralis();
@@ -35,14 +36,22 @@ const Web3Caller = () => {
     },
   });
 
+  async function updateFrontend(){
+    setContractAddress(contractAddr)
+    pushDatabase()
+    handleNotification("Transaction Completed");
+  }
+let contractAddr
   async function handleSuccess(tx) {
     await tx.wait(1);
-    handleNotification();
+    contractAddr = await getContracts({
+      onSuccess:updateFrontend
+    })
   }
-  function handleNotification() {
+  function handleNotification(message) {
     dispatch({
       type: "info",
-      message: "Transaction Completed",
+      message: `${message}`,
       title: "Tx Notification",
       position: "topR",
     });
@@ -54,15 +63,22 @@ const Web3Caller = () => {
     });
   }
   const pushDatabase = async() =>{
-    
+    await axios.post("http://localhost:4004/postdata",{
+      "deployer":account,
+      "contract":contract,
+      "name":username
+    })
+    handleNotification("Database Updated!")
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await deployFundMe({
-      onSuccess: handleSuccess,
-      onError: (error) => handleError(error)
-    });
-    pushDatabase()
+    try{
+      await deployFundMe({
+        onSuccess: handleSuccess,
+        onError: (error) => handleError(error)
+      });
+    }
+    catch(error){}
   };
   const changeHandlerUsername = (e) => {
     setUsername(e.target.value);
@@ -104,10 +120,12 @@ const Web3Caller = () => {
               Submit
             </button>
           </form>
-          <Table />
+          <Table/>
         </>
       ) : (
-        <>Already Deployed By {account}</>
+        <>Already Deployed By {account}
+        <Table />
+        </>
       )}
     </div>
   );

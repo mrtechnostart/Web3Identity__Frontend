@@ -7,16 +7,18 @@ import axios from 'axios'
 const MultiPage = () => {
     const {addr} = useParams()    
     const [contract,setContract ] = useState("0x0")
+
+    /* Currently Using Deployer Address, some bugs are faced as per contract Address */
     useEffect(()=>{
         async function getData(){
             const data = await axios.get("http://localhost:4004/postdata/"+addr)
-            setContract(data["data"]["task"]["contract"])
+            setContract(data["data"]["task"]["deployer"])
         }
         getData()
     })
   return (
     <div>
-      <FundMe contractAddress={contract}/>
+      <FundMe deployerAddress={contract}/>
     </div>
   )
 }
