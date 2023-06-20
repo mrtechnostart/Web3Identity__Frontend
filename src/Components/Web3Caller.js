@@ -120,11 +120,11 @@ let contractAddr
               Submit
             </button>
           </form>
-          <Table/>
+          <Table chainId={chainId}/>
         </>
       ) : (
         <>Already Deployed By {account}
-        <Table />
+        <Table chainId={chainId}/>
         </>
       )}
     </div>

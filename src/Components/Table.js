@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useMoralis } from "react-moralis";
 const Table = () => {
   const [data, setData] = useState([]);
+  const {account,chainId:chainIdHex} = useMoralis()
+  const chainId = parseInt(chainIdHex)
   async function getData() {
-    const dbData = await axios.get("http://localhost:4004/postdata");
+    const dbData = await axios.get("http://localhost:4004/postdata/chainId/"+chainId);
     setData(dbData["data"]["tasks"]);
   }
   useEffect(() => {
     getData();
-  }, []);
+  }, [chainId,account]);
   return (
     <div>
       <table class="table container">
