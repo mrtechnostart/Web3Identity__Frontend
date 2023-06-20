@@ -9,7 +9,7 @@ const FundMe = (props) => {
   const chainId = parseInt(chainIdHex)
   const DeployerContractAddress =
     chainId in contractAddress ? contractAddress[chainId][0] : null
-  const [ethValue,setEthValue] = useState("0")
+  const [ethValue,setEthValue] = useState(ethers.utils.parseEther("0.001"))
   const [contract,setContract] = useState("0x0")
   const [amount,setAmount] = useState(0)
   const [currentAccount,setCurrentAccount] = useState("0x0")
@@ -17,7 +17,7 @@ const FundMe = (props) => {
     abi:abiFundMe,
     contractAddress:contract,
     functionName:"fundContract",
-    msgValue:ethValue
+    msgValue:ethers.utils.parseEther(amount.toString())
   })
   const {runContractFunction:withdrawFund,isLoading:Load,isFetching:Fetch } = useWeb3Contract({
     abi:abiFundMe,
@@ -33,6 +33,8 @@ const FundMe = (props) => {
     contractAddress:contract,
     functionName:"getmineth"
   })
+    
+
   const {runContractFunction:getContracts} = useWeb3Contract({
     abi:abi,
     contractAddress:DeployerContractAddress,
@@ -43,9 +45,9 @@ const FundMe = (props) => {
   })
   async function getbasicdata(){
     if (isWeb3Enabled){
+      const contractAddr = await getContracts()
       const mineth = await getmineth()
       setEthValue(mineth)
-      const contractAddr = await getContracts()
       setContract(contractAddr)
       setCurrentAccount(account)
     }
@@ -55,6 +57,7 @@ const FundMe = (props) => {
   };
   const handleSubmit = async(e) =>{
     e.preventDefault()
+    setEthValue(ethers.utils.parseEther(amount.toString()))
     await fundContract({
       onSuccess:handleSuccess,
       onError:(error)=>handleError(error)
@@ -62,6 +65,7 @@ const FundMe = (props) => {
   }
   async function handleSuccess(tx) {
     await tx.wait(1);
+    setEthValue(ethers.utils.parseEther("0.001"))
     handleNotification();
   }
   function handleNotification() {
@@ -107,7 +111,7 @@ const FundMe = (props) => {
           aria-describedby="emailHelp"
         />
       </div>
-      <button type="submit" className="btn btn-primary" disabled={isLoading || isFetching || ethValue > ethers.utils.parseEther(amount.toString()===""?"0":amount.toString())}>
+      <button type="submit" className="btn btn-primary" disabled={isLoading || isFetching }>
         Donate Now!
       </button>
     </form></>}
