@@ -123,8 +123,11 @@ let contractAddr
           <Table chainId={chainId}/>
         </>
       ) : (
-        <>Already Deployed By {account}
+        <>
+        <div className="container">
+          You Have Already Deployed Your Identity By {account}
         <Table chainId={chainId}/>
+          </div>
         </>
       )}
     </div>
