@@ -13,7 +13,7 @@ const Web3Caller = () => {
   const [contract, setContractAddress] = useState(defaultAddress);
   const chainId = parseInt(chainIdHex);
   const ContractAddress =
-    chainId in contractAddress ? contractAddress[chainId][0] : null;
+    chainId in contractAddress ? contractAddress[chainId][0] : null
   const dispatch = useNotification();
   const {
     runContractFunction: deployFundMe,
@@ -65,7 +65,7 @@ let contractAddr
   const pushDatabase = async() =>{
     await axios.post("http://localhost:4004/postdata",{
       "deployer":account,
-      "contract":contract,
+      "chainId":chainId,
       "name":username
     })
     handleNotification("Database Updated!")

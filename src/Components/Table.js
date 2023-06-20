@@ -17,7 +17,6 @@ const Table = () => {
           <tr>
             <th scope="col">#</th>
             <th scope="col">Deployer Address</th>
-            <th scope="col">Contract Address</th>
             <th scope="col">Name</th>
             <th scope="col">Link</th>
           </tr>
@@ -29,7 +28,6 @@ const Table = () => {
                 <tr>
                   <th scope="row">{index + 1}</th>
                   <td>{element["deployer"]}</td>
-                  <td>{element["contract"]}</td>
                   <td>{element["name"]}</td>
                   <td>
                     <Link
