@@ -8,12 +8,12 @@ import axios from "axios";
 const Web3Caller = () => {
   const defaultAddress = "0x0000000000000000000000000000000000000000";
   const { chainId: chainIdHex, account, isWeb3Enabled } = useMoralis();
-  const mineth = ethers.utils.parseEther("0.001")
+  const mineth = ethers.utils.parseEther("0.001");
   const [username, setUsername] = useState("");
   const [contract, setContractAddress] = useState(defaultAddress);
   const chainId = parseInt(chainIdHex);
   const ContractAddress =
-    chainId in contractAddress ? contractAddress[chainId][0] : null
+    chainId in contractAddress ? contractAddress[chainId][0] : null;
   const dispatch = useNotification();
   const {
     runContractFunction: deployFundMe,
@@ -36,17 +36,17 @@ const Web3Caller = () => {
     },
   });
 
-  async function updateFrontend(){
-    setContractAddress(contractAddr)
-    pushDatabase()
+  async function updateFrontend() {
+    setContractAddress(contractAddr);
+    pushDatabase();
     handleNotification("Transaction Completed");
   }
-let contractAddr
+  let contractAddr;
   async function handleSuccess(tx) {
     await tx.wait(1);
     contractAddr = await getContracts({
-      onSuccess:updateFrontend
-    })
+      onSuccess: updateFrontend,
+    });
   }
   function handleNotification(message) {
     dispatch({
@@ -62,23 +62,22 @@ let contractAddr
       message: error,
     });
   }
-  const pushDatabase = async() =>{
-    await axios.post("http://localhost:4004/postdata",{
-      "deployer":account,
-      "chainId":chainId,
-      "name":username
-    })
-    handleNotification("Database Updated!")
-  }
+  const pushDatabase = async () => {
+    await axios.post("http://localhost:4004/postdata", {
+      deployer: account,
+      chainId: chainId,
+      name: username,
+    });
+    handleNotification("Database Updated!");
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
+    try {
       await deployFundMe({
         onSuccess: handleSuccess,
-        onError: (error) => handleError(error)
+        onError: (error) => handleError(error),
       });
-    }
-    catch(error){}
+    } catch (error) {}
   };
   const changeHandlerUsername = (e) => {
     setUsername(e.target.value);
@@ -120,13 +119,13 @@ let contractAddr
               Submit
             </button>
           </form>
-          <Table chainId={chainId}/>
+          <Table chainId={chainId} />
         </>
       ) : (
         <>
-        <div className="container">
-          You Have Already Deployed Your Identity By {account}
-        <Table chainId={chainId}/>
+          <div className="container">
+            You Have Already Deployed Your Identity By {account}
+            <Table chainId={chainId} />
           </div>
         </>
       )}
